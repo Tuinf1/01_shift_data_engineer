@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 import numpy as np
 import json
+from db_insert import insert_to_db
+
 
 def fetch_data(lat, lon, start, end):
     url = "https://api.open-meteo.com/v1/forecast"
@@ -116,6 +118,14 @@ def main():
         f.write("metric,values\n")
         for metric, values in rows:
             f.write(f"{metric},{values}\n")
+
+    
+    dates = pd.to_datetime(data["daily"]["sunrise"], unit="s").normalize().strftime("%Y-%m-%d").tolist()
+
+    
+    from db_insert import insert_to_db
+    insert_to_db(rows, dates)
+
 
     print("Готово: weather_metrics_full.csv")
 
