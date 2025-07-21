@@ -40,18 +40,18 @@ docker-compose down -v
 ```bash
 ETL-скрипт для получения погодных данных из [Open-Meteo API](https://open-meteo.com/), обработки и сохранения в `.csv`.
 
-Обоснование архитектуры и решений
+Краткое описание:
 
 Получение данных 
-Используется Open-Meteo API с параметрами:
+Используется Open-Meteo API с параметрами.
 
 hourly — для получения погодных метрик по часам
 
 daily — для рассчёта светового дня (sunrise/sunset)
 
-timeformat=unixtime упрощает преобразование в datetime
-
-Аргументы:
+Метрики агрегируются по дням (24h) и по световому дню (daylight)
+Имена признаков генерируются автоматически (например, avg_temperature_2m_24h, total_rain_daylight)
+Каждая строка содержит имя метрики и список значений (в формате JSON)
 
 API не требует токена, стабилен и бесплатен
 
@@ -59,22 +59,19 @@ API не требует токена, стабилен и бесплатен
 ```
 ## 2 Задание
 ```bash
-Сохранение в базу данных
-Данные сохраняются в PostgreSQL через docker-compose и SQL-инициализацию.
+
+Сохранение в базу данных в  PostgreSQL через docker-compose и SQL-инициализацию.
 
 docker-compose.yml поднимает контейнер с PostgreSQL и создаёт базу weather
 
 init.sql автоматически создаёт таблицу weather_metrics с полями:
+date DATE;
+metric TEXT;
+value TEXT.
 
-date DATE
+Это позволяет хранить как числовые метрики, так и строки (ISO-время восхода/заката).
+Вставка реализована через psycopg2, данные сохраняются из weather_etl.py.
 
-metric TEXT
-
-value TEXT
-
-Это позволяет хранить как числовые метрики, так и строки (например, ISO-время восхода/заката).
-
-Вставка реализована через psycopg2, данные сохраняются из ETL-скрипта weather_etl.py.
 
 Защита от дубликатов
 В таблице weather_metrics задан PRIMARY KEY (date, metric)
@@ -85,23 +82,7 @@ value TEXT
 
 Структура проекта:
 
-csharp
-Копировать
-Редактировать
-.
-├── docker-compose.yml        # запуск PostgreSQL
-├── init.sql                  # создание таблицы
-├── requirements.txt
-├── weather_metrics_full.csv  # выгрузка
-└── app/
-    ├── weather_etl.py        # основной ETL
-    └── db_insert.py          # вставка в базу
- Формат данных
-Метрики агрегируются по дням (24h) и по световому дню (daylight)
 
-Имена признаков генерируются автоматически (например, avg_temperature_2m_24h, total_rain_daylight)
-
-Каждая строка содержит имя метрики и список значений (в формате JSON)
 ```
 
 ## 3 Задание
@@ -111,6 +92,7 @@ csharp
 
 python app/weather_etl.py --start 2025-06-01 --end 2025-06-07
 
+Просмотр таблицы в PostgreSQL
 docker exec -it weather-db psql -U user -d weather
 \d weather_metrics
-
+либо через show.py
