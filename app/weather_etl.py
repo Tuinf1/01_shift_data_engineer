@@ -7,6 +7,7 @@ from db_insert import insert_to_db
 
 import argparse
 
+# CLI передача параметров
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--start", type=str, required=True, help="Дата начала (YYYY-MM-DD)")
@@ -39,7 +40,7 @@ def fetch_data(lat, lon, start, end):
     }
     return requests.get(url, params=params).json()
 
-# Агрегация метрики по суткам (mean или sum)
+# Агрегация метрики по суткам
 def aggregate_24h(data, metric, agg_type="mean"):
     time = pd.to_datetime(data["hourly"]["time"], unit="s")
     values = np.array(data["hourly"][metric], dtype=float)
@@ -126,7 +127,7 @@ def main():
     rows.append(("sunrise_iso", json.dumps(sunrise_iso)))
     rows.append(("sunset_iso", json.dumps(sunset_iso)))
     
-    # Удаляем временное поле
+    # Удаляем временное поле 
     rows = [r for r in rows if r[0] != "time"]
 
     # Сохраняем в CSV
