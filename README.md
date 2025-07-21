@@ -1,13 +1,11 @@
 # ETL
 
-
-
-## Стек
-
-- Python 3.x
+## Используемые библиотеки
+- Python
 - Pandas
 - NumPy
 - Requests
+- psycopg2
 
 ## Установка
 
