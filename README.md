@@ -18,12 +18,24 @@ pip install -r requirements.txt
 
 
 docker-compose up -d
-python app/weather_etl.py
+python app/weather_etl.py --start 2025-06-01 --end 2025-06-07
 
 # удаление 
 docker-compose down -v
-```
 
+
+Структура
+.
+├── docker-compose.yml           # запуск PostgreSQL
+├── init.sql                     # создание таблицы
+├── requirements.txt
+├── weather_metrics_full.csv     # выгрузка в csv
+├── README.md
+├── show.py                      # просмотр PostgreSQL
+└── app/
+    ├── weather_etl.py           # основной ETL
+    └── db_insert.py             # вставка в БД
+```
 ## 1 Задание
 ```bash
 ETL-скрипт для получения погодных данных из [Open-Meteo API](https://open-meteo.com/), обработки и сохранения в `.csv`.
@@ -100,3 +112,5 @@ csharp
 python app/weather_etl.py --start 2025-06-01 --end 2025-06-07
 
 docker exec -it weather-db psql -U user -d weather
+\d weather_metrics
+
