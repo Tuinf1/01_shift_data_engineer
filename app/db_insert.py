@@ -1,7 +1,8 @@
-def insert_to_db(rows, dates):
-    import psycopg2
-    import json
+import psycopg2
+import json
+from datetime import datetime
 
+def insert_to_db(rows, dates):
     conn = psycopg2.connect(
         dbname="weather",
         user="user",
@@ -19,7 +20,7 @@ def insert_to_db(rows, dates):
                     INSERT INTO weather_metrics (date, metric, value)
                     VALUES (%s, %s, %s)
                     ON CONFLICT (date, metric) DO NOTHING
-                """, (d, metric, str(v)))  # сохраняем как текст
+                """, (d, metric, v))
     conn.commit()
     cur.close()
     conn.close()

@@ -2,4 +2,6 @@ pandas
 numpy
 requests
 psycopg2-binary
+argparse
+
 # venv\\Scripts\\activate

@@ -4,8 +4,19 @@ import numpy as np
 import json
 from db_insert import insert_to_db
 
+
+import argparse
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--start", type=str, required=True, help="Дата начала (YYYY-MM-DD)")
+    parser.add_argument("--end", type=str, required=True, help="Дата конца (YYYY-MM-DD)")
+    return parser.parse_args()
+
 # Запрос данных из Open-Meteo API
 def fetch_data(lat, lon, start, end):
+
+
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
@@ -28,7 +39,7 @@ def fetch_data(lat, lon, start, end):
     }
     return requests.get(url, params=params).json()
 
-# Агрегация метрики по суткам
+# Агрегация метрики по суткам (mean или sum)
 def aggregate_24h(data, metric, agg_type="mean"):
     time = pd.to_datetime(data["hourly"]["time"], unit="s")
     values = np.array(data["hourly"][metric], dtype=float)
@@ -56,9 +67,9 @@ def aggregate_daylight(data, metric, agg_type="mean"):
     return np.round(daily, 6).tolist()
 
 def main():
+    args = parse_args()
     lat, lon = 55.0, 83.0
-    start, end = "2025-05-16", "2025-05-30"
-    data = fetch_data(lat, lon, start, end)
+    data = fetch_data(lat, lon, args.start, args.end)
 
     # Список дат (по восходу солнца), используется как индекс
     time = pd.to_datetime(data["daily"]["sunrise"], unit="s").normalize().strftime("%Y-%m-%d").tolist()
@@ -123,14 +134,14 @@ def main():
         f.write("metric,values\n")
         for metric, values in rows:
             f.write(f"{metric},{values}\n")
-    print("Готово: weather_metrics_full.csv")
+
     # Подготовка списка дат
     dates = pd.to_datetime(data["daily"]["sunrise"], unit="s").normalize().strftime("%Y-%m-%d").tolist()
 
-    # Сохр. PostgreSQL
+    # Сохраняем в PostgreSQL
     insert_to_db(rows, dates)
 
-    
+    print("Готово: weather_metrics_full.csv")
 
 if __name__ == "__main__":
     main()

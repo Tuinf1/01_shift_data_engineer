@@ -90,4 +90,13 @@ csharp
 Имена признаков генерируются автоматически (например, avg_temperature_2m_24h, total_rain_daylight)
 
 Каждая строка содержит имя метрики и список значений (в формате JSON)
+```
 
+## 3 Задание
+```bash
+
+пример запуска: 
+
+python app/weather_etl.py --start 2025-06-01 --end 2025-06-07
+
+docker exec -it weather-db psql -U user -d weather
