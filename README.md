@@ -88,6 +88,9 @@ value TEXT.
 ## 3 Задание
 ```bash
 
+реализация через функцию def parse_args() в weather_etl.py
+
+
 пример запуска: 
 
 python app/weather_etl.py --start 2025-06-01 --end 2025-06-07
